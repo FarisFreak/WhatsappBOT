@@ -89,25 +89,31 @@ export namespace Module {
             const buildData = {
                 data: config,
                 execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => {
-                    // Special condition
-                    if (config.type == ModuleType.Messages.Upsert){
-                        if (config.param != null && config.param != ''){
-                            // Check if chat use param
-                            const baseData = data as BaileysEventMap['messages.upsert'];
-                            // if (baseData.type != 'notify')
-                            //     return;
-
+                    const { type, param } = config;
+                
+                    if (type !== ModuleType.Messages.Upsert) {
+                        execute(socks, data);
+                    } else {
+                        const baseData = data as BaileysEventMap['messages.upsert'];
+                
+                        if (param && param !== '') {
                             baseData.messages.forEach(msg => {
-                                const chatCmd = new ChatModule(msg);
-                                if (chatCmd.Get.Command() != config.param)
+                                if (msg.broadcast || msg.key.fromMe) {
                                     return;
+                                }
+                        
+                                const chatCmd = new ChatModule(msg);
+                                if (chatCmd.Get.Command() === param) {
+                                    execute(socks, data);
+                                }
                             });
+                        } else {
+                            execute(socks, data);
                         }
                     }
-                    execute(socks, data);
                 },
             };
-
+            
             return buildData;
         }
     }
