@@ -1,0 +1,7 @@
+node_modules
+_dist
+dist
+package-lock.json
+config/default.json
+baileys_auth_info
+baileys_store_multi.json
