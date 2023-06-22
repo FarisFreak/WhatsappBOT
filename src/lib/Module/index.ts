@@ -10,6 +10,7 @@ import { ModuleType } from "../ModuleBuilder";
 import { Chat as ChatModule } from "../Chat";
 import CliTable3 from "cli-table3";
 import colors from "@colors/colors";
+
 export namespace Module {
     export declare type ExecutionData =
     | Partial<ConnectionState>
@@ -113,7 +114,7 @@ export namespace Module {
                     }
                 },
             };
-            
+
             return buildData;
         }
     }

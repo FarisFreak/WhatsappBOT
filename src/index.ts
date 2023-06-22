@@ -2,7 +2,6 @@ import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion, isJidBroadca
 import { Boom } from '@hapi/boom';
 import MAIN_LOGGER from '@whiskeysockets/baileys/lib/Utils/logger';
 import NodeCache from 'node-cache';
-import { Chat } from './lib/Chat';
 import { Module } from './lib/Module';
 import { Types as ModuleType } from './lib/Module/Types';
 
