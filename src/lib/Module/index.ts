@@ -8,6 +8,8 @@ import { Label } from "@whiskeysockets/baileys/lib/Types/Label";
 import { LabelAssociation } from "@whiskeysockets/baileys/lib/Types/LabelAssociation";
 import { ModuleType } from "../ModuleBuilder";
 import { Chat as ChatModule } from "../Chat";
+import CliTable3 from "cli-table3";
+import colors from "@colors/colors";
 export namespace Module {
     export declare type ExecutionData =
     | Partial<ConnectionState>
@@ -92,8 +94,8 @@ export namespace Module {
                         if (config.param != null && config.param != ''){
                             // Check if chat use param
                             const baseData = data as BaileysEventMap['messages.upsert'];
-                            if (baseData.type != 'notify')
-                                return;
+                            // if (baseData.type != 'notify')
+                            //     return;
 
                             baseData.messages.forEach(msg => {
                                 const chatCmd = new ChatModule(msg);
@@ -112,6 +114,7 @@ export namespace Module {
 
     export class Loader {
         // List: any[] = [];
+        protected _AllList: any[] = [];
         protected _List: any[] = [];
         protected filteredModules: any[] = [];
         protected isFiltered: boolean = false;
@@ -120,7 +123,7 @@ export namespace Module {
             return this._List;
         }
 
-        constructor() {
+        constructor(showTable: boolean = false) {
             const modulesPath = path.join(__dirname, '../../modules');
             const modulesFiles = fs.readdirSync(modulesPath).filter(file => file.endsWith('.js'));
 
@@ -132,9 +135,32 @@ export namespace Module {
                     if (!module.data.disabled) {
                         this._List.push(module);
                     }
+                    this._AllList.push(module);
                 } else {
                     console.log(`[WARNING] The module at ${filePath} is missing a required "data" or "execute" property. module disabled.`);
                 }
+            }
+
+            if (showTable){
+                let table = new CliTable3({
+                    head: [colors.cyan('Module Name'), colors.cyan('Description'), colors.cyan('Status')]
+                });
+    
+                this._AllList.sort((a: any, b: any) => {
+                    if (a.data.name < b.data.name)
+                        return -1;
+
+                    if (a.data.name > b.data.name)
+                        return 1;
+
+                    return 0;
+                });
+
+                this._AllList.forEach(module => {
+                    table.push([colors.yellow(module.data.name), module.data.desc, module.data.disabled ? colors.red("Disabled"): colors.green("Enabled")]);
+                });
+    
+                console.log(table.toString());
             }
         }
 

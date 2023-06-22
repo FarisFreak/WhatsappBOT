@@ -18,7 +18,7 @@ setInterval(() => {
     store?.writeToFile('./baileys_store_multi.json')
 }, 10_000);
 
-const ModuleLoader = new Module.Loader();
+const ModuleLoader = new Module.Loader(true);
 
 const startSock = async() => {
     const {state, saveCreds} = await useMultiFileAuthState('baileys_auth_info');
