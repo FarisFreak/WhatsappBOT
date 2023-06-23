@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "node-config-ts",
+    "build-clean": "rimraf dist && tspc",
     "build": "tspc",
     "start": "node ./dist/index.js"
   },
@@ -19,6 +20,7 @@
     "tsc-progress": "^1.0.4"
   },
   "devDependencies": {
+    "rimraf": "^5.0.1",
     "ts-patch": "^3.0.0",
     "typescript": "^5.1.3"
   }
