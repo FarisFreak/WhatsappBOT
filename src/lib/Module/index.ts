@@ -84,8 +84,11 @@ export namespace Module {
             execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => void
         ) {
             if (!('disabled' in config)) {
-            config.disabled = false;
+                config.disabled = false;
             }
+
+            if (!('hide' in config))
+                config.hide = false;
 
             const buildData = {
                 data: config,
@@ -139,10 +142,11 @@ export namespace Module {
                 const module = require(filePath);
 
                 if ('data' in module && 'execute' in module) {
-                    if (!module.data.disabled) {
+                    if (!module.data.disabled && !module.data.hide) 
                         this._List.push(module);
-                    }
-                    this._AllList.push(module);
+
+                    if (!module.data.hide)
+                        this._AllList.push(module);
                 } else {
                     console.log(`[WARNING] The module at ${filePath} is missing a required "data" or "execute" property. module disabled.`);
                 }
@@ -150,21 +154,21 @@ export namespace Module {
 
             if (showTable){
                 let table = new CliTable3({
-                    head: [colors.cyan('Module Name'), colors.cyan('Description'), colors.cyan('Status')]
+                    head: [colors.cyan('Module Name'), colors.cyan('Type'), colors.cyan('Description'), colors.cyan('Status')]
                 });
     
                 this._AllList.sort((a: any, b: any) => {
-                    if (a.data.name < b.data.name)
+                    if (a.data.name < b.data.name && a.data.type < b.data.type)
                         return -1;
 
-                    if (a.data.name > b.data.name)
+                    if (a.data.name > b.data.name && a.data.type > b.data.type)
                         return 1;
 
                     return 0;
                 });
 
                 this._AllList.forEach(module => {
-                    table.push([colors.yellow(module.data.name), module.data.desc, module.data.disabled ? colors.red("Disabled"): colors.green("Enabled")]);
+                    table.push([colors.green(module.data.name), colors.yellow(module.data.type), module.data.desc, module.data.disabled ? colors.bgRed.white("Disabled"): colors.bgGreen.white("Enabled")]);
                 });
     
                 console.log(table.toString());

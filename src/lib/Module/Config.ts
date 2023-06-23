@@ -6,4 +6,5 @@ export declare type Config = {
     desc: string,
     type: string | typeof Types,
     disabled?: boolean,
+    hide?: boolean
 }
