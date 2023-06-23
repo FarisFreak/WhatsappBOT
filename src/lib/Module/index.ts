@@ -105,11 +105,14 @@ export namespace Module {
                                 if (msg.broadcast || msg.key.fromMe) {
                                     return;
                                 }
-                        
-                                const chatCmd = new ChatModule(msg);
-                                if (chatCmd.Get.Command() === param) {
-                                    execute(socks, data);
+
+                                if (msg.messageStubType == null && msg.messageStubType == undefined){
+                                    const chatCmd = new ChatModule(msg);
+                                    if (chatCmd.Get.Command() === param) {
+                                        execute(socks, data);
+                                    }
                                 }
+                        
                             });
                         } else {
                             execute(socks, data);
