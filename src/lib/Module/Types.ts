@@ -18,7 +18,7 @@ export const Types = {
   MessageReceipt : {
       Update : 'message-receipt.update'
   },
-  MessageingHistory : {
+  MessagingHistory : {
       Set : 'messaging-history.set'
   },
   Chats : {

@@ -138,7 +138,7 @@ const startSock = async() => {
         }
 
         if (events['messaging-history.set']){
-            ModuleLoader.Filter.Type(ModuleType.MessageingHistory.Set);
+            ModuleLoader.Filter.Type(ModuleType.MessagingHistory.Set);
             const modules = ModuleLoader.FilterResult();
 
             modules.forEach(m => {
