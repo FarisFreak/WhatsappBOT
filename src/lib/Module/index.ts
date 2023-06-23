@@ -6,7 +6,6 @@ import path from 'path';
 import fs from 'fs';
 import { Label } from "@whiskeysockets/baileys/lib/Types/Label";
 import { LabelAssociation } from "@whiskeysockets/baileys/lib/Types/LabelAssociation";
-import { ModuleType } from "../ModuleBuilder";
 import { Chat as ChatModule } from "../Chat";
 import CliTable3 from "cli-table3";
 import colors from "@colors/colors";
@@ -95,7 +94,7 @@ export namespace Module {
                 execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => {
                     const { type, param } = config;
                 
-                    if (type !== ModuleType.Messages.Upsert) {
+                    if (type !== Types.Messages.Upsert) {
                         execute(socks, data);
                     } else {
                         const baseData = data as BaileysEventMap['messages.upsert'];
