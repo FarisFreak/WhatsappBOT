@@ -13,26 +13,26 @@ const Cfg : Config = {
     disabled: false
 };
 
-module.exports = new Module.Builder(Cfg, (socks, data) => {
+module.exports = new Module.Builder(Cfg, async (socks, data) => {
     const bData = data as BaileysEventMap['messages.upsert'];
     
-    bData.messages.forEach(async m => {
-        let participants: string[] = [];
-        let textParticipants: string = "";
+    for (const m of bData.messages) {
+        if (!m.key.participant)
+            continue;
 
-        let currentNumber = socks.user?.id.replace(/(?=:)(.*?)(?=@)/g, "");
+        const currentNumber = socks.user?.id.replace(/(?=:)(.*?)(?=@)/g, "");
+        const groupdata = await socks.groupMetadata(m.key.remoteJid as string);
 
-        if (m.key.participant != null && m.key.participant != undefined){
-            let groupdata = await socks.groupMetadata(m.key.remoteJid as string);
+        const participants = groupdata.participants
+            .filter(member => member.id !== currentNumber)
+            .map(member => member.id);
 
-            groupdata.participants.forEach(member => {
-                if (member.id != currentNumber){
-                    participants.push(member.id);
-                    textParticipants += `@${member.id.split('@')[0]} `;
-                }
 
-            })
-            await socks.sendMessage(m.key.remoteJid as string, {text: textParticipants, mentions: participants}, {quoted : m});
-        }
-    });
+        await socks.sendMessage(m.key.remoteJid as string, {
+            text: participants.map(m => { return `@${m.split('@')[0]}`}).join(" "),
+            mentions: participants
+        }, {
+            quoted: m
+        });
+    }
 });
