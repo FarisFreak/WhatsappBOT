@@ -5,7 +5,7 @@ import { Config } from "../lib/Module/Config";
 
 const Cfg : Config = {
     name: 'Ping Command',
-    param: 'ping',
+    command: 'ping',
     desc: 'Command Desc',
     type: ModuleType.Messages.Upsert,
     disabled: false

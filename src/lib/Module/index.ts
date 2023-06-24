@@ -92,22 +92,22 @@ export namespace Module {
             const buildData = {
                 data: config,
                 execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => {
-                    const { type, param } = config;
+                    const { type, command } = config;
                 
                     if (type !== Types.Messages.Upsert) {
                         execute(socks, data);
                     } else {
                         const baseData = data as BaileysEventMap['messages.upsert'];
                 
-                        if (param && param !== '') {
+                        if (command && command !== '') {
                             baseData.messages.forEach(msg => {
                                 if (msg.broadcast || msg.key.fromMe) {
                                     return;
                                 }
 
                                 if (msg.messageStubType == null && msg.messageStubType == undefined){
-                                    const chatCmd = new ChatModule(msg);
-                                    if (chatCmd.Get.Command() === param) {
+                                    const chatCmd = new ChatModule(msg, config.prefix);
+                                    if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)){
                                         execute(socks, data);
                                     }
                                 }
