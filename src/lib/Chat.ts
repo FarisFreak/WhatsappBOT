@@ -1,8 +1,8 @@
 import {config} from 'node-config-ts';
-import { proto } from '@whiskeysockets/baileys/WAProto/index';
+import { proto } from '@whiskeysockets/baileys/WAProto/index.js';
 
 export class Chat {
-    private _message : proto.IMessage | string;
+    private _message : proto.IMessage | string = '';
     private _prefix? : string;
     private _command? : string;
     private _value? : string;
@@ -17,9 +17,6 @@ export class Chat {
 
         this._prefix = prefix ? prefix : config.prefix;
 
-        this._getText();
-    }
-    protected _getText() {
         if (typeof this._message === 'string') {
             this._textMessage = this._message;
         } else {
@@ -33,8 +30,6 @@ export class Chat {
                 this._textMessage = ((this._message as proto.IMessage).videoMessage?.caption as string);
             else if (this._message.documentMessage?.caption)
                 this._textMessage = ((this._message as proto.IMessage).documentMessage?.caption as string);
-            else
-                this._textMessage = '';
         }
 
     }
@@ -49,7 +44,6 @@ export class Chat {
     public Get = {
         Prefix : this._prefix,
         Message : () => { return this._message; },
-        
         Command : () => {
             let _message_split = this._textMessage?.split(' ');
 

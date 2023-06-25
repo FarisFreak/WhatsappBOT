@@ -1,14 +1,19 @@
 import makeWASocket, { AuthenticationCreds, BaileysEventMap, Chat, ChatUpdate, ConnectionState, Contact, GroupMetadata, MessageUpsertType, MessageUserReceiptUpdate, ParticipantAction, PresenceData, proto, WACallEvent, WAMessage, WAMessageKey, WAMessageUpdate } from "@whiskeysockets/baileys";
 import type { Boom } from '@hapi/boom';
-import { Config } from "./Config";
-import { Types } from "./Types";
+import { Config } from "./Config.js";
+import { Types } from "./Types.js";
 import path from 'path';
 import fs from 'fs';
-import { Label } from "@whiskeysockets/baileys/lib/Types/Label";
-import { LabelAssociation } from "@whiskeysockets/baileys/lib/Types/LabelAssociation";
-import { Chat as ChatModule } from "../Chat";
+import { Label } from "@whiskeysockets/baileys/lib/Types/Label.js";
+import { LabelAssociation } from "@whiskeysockets/baileys/lib/Types/LabelAssociation.js";
+import { Chat as ChatModule } from "../Chat.js";
 import CliTable3 from "cli-table3";
 import colors from "@colors/colors";
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export namespace Module {
     export declare type ExecutionData =
@@ -80,7 +85,7 @@ export namespace Module {
     export class Builder {
         constructor(
             config: Config,
-            execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => void
+            execute: (socks: ReturnType<typeof makeWASocket.default>, data: ExecutionData, glob: any) => void
         ) {
             if (!('disabled' in config)) {
                 config.disabled = false;
@@ -91,11 +96,11 @@ export namespace Module {
 
             const buildData = {
                 data: config,
-                execute: (socks: ReturnType<typeof makeWASocket>, data: ExecutionData) => {
+                execute: (socks: ReturnType<typeof makeWASocket.default>, data: ExecutionData, glob: any) => {
                     const { type, command } = config;
                 
                     if (type !== Types.Messages.Upsert) {
-                        execute(socks, data);
+                        execute(socks, data, glob);
                     } else {
                         const baseData = data as BaileysEventMap['messages.upsert'];
                 
@@ -108,13 +113,13 @@ export namespace Module {
                                 if (msg.messageStubType == null && msg.messageStubType == undefined){
                                     const chatCmd = new ChatModule(msg, config.prefix);
                                     if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)){
-                                        execute(socks, data);
+                                        execute(socks, data, glob);
                                     }
                                 }
                         
                             });
                         } else {
-                            execute(socks, data);
+                            execute(socks, data, glob);
                         }
                     }
                 },
@@ -139,42 +144,46 @@ export namespace Module {
             const modulesPath = path.join(__dirname, '../../modules');
             const modulesFiles = fs.readdirSync(modulesPath).filter(file => file.endsWith('.js'));
 
-            for (const file of modulesFiles) {
-                const filePath = path.join(modulesPath, file);
-                const module = require(filePath);
-
-                if ('data' in module && 'execute' in module) {
-                    if (!module.data.disabled && !module.data.hide) 
-                        this._List.push(module);
-
-                    if (!module.data.hide)
-                        this._AllList.push(module);
-                } else {
-                    console.log(`[WARNING] The module at ${filePath} is missing a required "data" or "execute" property. module disabled.`);
+            (async() => {
+                for (const file of modulesFiles) {
+                    const filePath = path.join(modulesPath, file);
+                    const _module = await import("file:///"+filePath);
+                    const module = _module.default;
+    
+                    if ('data' in module && 'execute' in module) {
+                        if (!module.data.disabled && !module.data.hide) 
+                            this._List.push(module);
+    
+                        if (!module.data.hide)
+                            this._AllList.push(module);
+                    } else {
+                        console.log(`[WARNING] The module at ${filePath} is missing a required "data" or "execute" property. module disabled.`);
+                    }
                 }
-            }
-
-            if (showTable){
-                let table = new CliTable3({
-                    head: [colors.cyan('Module Name'), colors.cyan('Type'), colors.cyan('Description'), colors.cyan('Status')]
-                });
     
-                this._AllList.sort((a: any, b: any) => {
-                    if (a.data.name < b.data.name && a.data.type < b.data.type)
-                        return -1;
-
-                    if (a.data.name > b.data.name && a.data.type > b.data.type)
-                        return 1;
-
-                    return 0;
-                });
-
-                this._AllList.forEach(module => {
-                    table.push([colors.green(module.data.name), colors.yellow(module.data.type), module.data.desc, module.data.disabled ? colors.bgRed.white("Disabled"): colors.bgGreen.white("Enabled")]);
-                });
+                if (showTable){
+                    let table = new CliTable3({
+                        head: [colors.cyan('Module Name'), colors.cyan('Type'), colors.cyan('Description'), colors.cyan('Status')]
+                    });
+        
+                    this._AllList.sort((a: any, b: any) => {
+                        if (a.data.name < b.data.name && a.data.type < b.data.type)
+                            return -1;
     
-                console.log(table.toString());
-            }
+                        if (a.data.name > b.data.name && a.data.type > b.data.type)
+                            return 1;
+    
+                        return 0;
+                    });
+    
+                    this._AllList.forEach(module => {
+                        table.push([colors.green(module.data.name), colors.yellow(module.data.type), module.data.desc, module.data.disabled ? colors.bgRed.white("Disabled"): colors.bgGreen.white("Enabled")]);
+                    });
+        
+                    console.log(table.toString());
+                }
+            })();
+
         }
 
         Filter = {

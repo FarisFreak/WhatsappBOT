@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "postinstall": "node-config-ts",
     "build-clean": "rimraf dist && tspc",

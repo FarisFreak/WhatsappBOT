@@ -1,7 +1,7 @@
-import { Module } from "../lib/Module";
-import { Types as ModuleType } from "../lib/Module/Types";
+import { Module } from "../lib/Module/index.js";
+import { Types as ModuleType } from "../lib/Module/Types.js";
 import { BaileysEventMap } from "@whiskeysockets/baileys";
-import { Config } from "../lib/Module/Config";
+import { Config } from "../lib/Module/Config.js";
 
 const Cfg : Config = {
     name: 'Ping Command',
@@ -11,7 +11,7 @@ const Cfg : Config = {
     disabled: false
 };
 
-module.exports = new Module.Builder(Cfg, (socks, data) => {
+export default new Module.Builder(Cfg, (socks, data) => {
     const bData = data as BaileysEventMap['messages.upsert'];
 
     bData.messages.forEach(m => {

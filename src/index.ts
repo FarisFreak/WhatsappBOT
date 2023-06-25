@@ -1,11 +1,15 @@
-import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion, isJidBroadcast, isJidUser, makeCacheableSignalKeyStore, makeInMemoryStore, proto, SignalDataSet, SignalDataTypeMap, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '@whiskeysockets/baileys';
+import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion, isJidBroadcast, isJidUser, makeCacheableSignalKeyStore, makeInMemoryStore, SignalDataSet, SignalDataTypeMap, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '@whiskeysockets/baileys';
+// import makeWASocket from "@whiskeysockets/baileys/lib/Socket/index.js";
+import pkg from '@whiskeysockets/baileys/WAProto/index.js';
+const {proto} = pkg;
+// import { proto } from '@whiskeysockets/baileys/WAProto/index.js';
 import { Boom } from '@hapi/boom';
-import MAIN_LOGGER from '@whiskeysockets/baileys/lib/Utils/logger';
+import MAIN_LOGGER from '@whiskeysockets/baileys/lib/Utils/logger.js';
 import NodeCache from 'node-cache';
-import { Module } from './lib/Module';
-import { Types as ModuleType } from './lib/Module/Types';
+import { Module } from './lib/Module/index.js';
+import { Types as ModuleType } from './lib/Module/Types.js';
 
-const logger = MAIN_LOGGER.child({});
+const logger = MAIN_LOGGER.default.child({});
 logger.level = 'silent';
 
 const msgRetryCounterCache = new NodeCache();
@@ -24,7 +28,7 @@ const startSock = async() => {
     const { version, isLatest } = await fetchLatestBaileysVersion();
     console.log(`using WA v${version.join('.')}, isLatest: ${isLatest}`);
     
-    const sock = makeWASocket({
+    const sock = makeWASocket.default({
         version,
         logger,
         printQRInTerminal: true,
