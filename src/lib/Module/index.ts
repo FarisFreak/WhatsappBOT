@@ -147,7 +147,7 @@ export namespace Module {
             (async() => {
                 for (const file of modulesFiles) {
                     const filePath = path.join(modulesPath, file);
-                    const _module = await import("file:///"+filePath);
+                    const _module = await import( `${process.platform === "win32" ? "file:///" : ""}${filePath}`);
                     const module = _module.default;
     
                     if ('data' in module && 'execute' in module) {
