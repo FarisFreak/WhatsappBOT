@@ -85,7 +85,6 @@ const startSock = async() => {
         }
 
         if (events['messages.upsert']){
-            //Execute all 
             ModuleLoader.Filter.Type(ModuleType.Messages.Upsert);
             const modules = ModuleLoader.FilterResult();
 
