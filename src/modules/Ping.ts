@@ -11,10 +11,10 @@ const Cfg : Config = {
     disabled: false
 };
 
-export default new Module.Builder(Cfg, (socks, data) => {
+export default new Module.Builder(Cfg, async (socks, data) => {
     const bData = data as BaileysEventMap['messages.upsert'];
 
-    bData.messages.forEach(m => {
-        socks.sendMessage(m.key.remoteJid as string, {text: "Pong!"});
-    });
+    for (const m of bData.messages){
+        await socks.sendMessage(m.key.remoteJid as string, {text: "Pong!"}, {quoted: m});
+    }
 });
