@@ -17,6 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export namespace Module {
     export declare type ExecutionData =
+    | WAMessage
     | Partial<ConnectionState>
     | Partial<AuthenticationCreds>
     | {
@@ -113,7 +114,7 @@ export namespace Module {
                                 if (msg.messageStubType == null && msg.messageStubType == undefined){
                                     const chatCmd = new ChatModule(msg, config.prefix);
                                     if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)){
-                                        execute(socks, data, glob);
+                                        execute(socks, msg, glob);
                                     }
                                 }
                         
