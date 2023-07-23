@@ -99,28 +99,25 @@ export namespace Module {
                 data: config,
                 execute: (socks: ReturnType<typeof makeWASocket.default>, data: ExecutionData, glob: any) => {
                     const { type, command } = config;
-                
+
                     if (type !== Types.Messages.Upsert) {
                         execute(socks, data, glob);
                     } else {
                         const baseData = data as BaileysEventMap['messages.upsert'];
-                
-                        if (command && command !== '') {
-                            baseData.messages.forEach(msg => {
-                                if (msg.broadcast || msg.key.fromMe) {
-                                    return;
-                                }
 
-                                if (msg.messageStubType == null && msg.messageStubType == undefined){
-                                    const chatCmd = new ChatModule(msg, config.prefix);
-                                    if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)){
-                                        execute(socks, msg, glob);
-                                    }
-                                }
-                        
-                            });
-                        } else {
-                            execute(socks, data, glob);
+                        for (const msg of baseData.messages){
+                            if (command && command !== ''){
+                                if (msg.broadcast || msg.key.fromMe)
+                                    continue;
+
+                                if (!msg.messageStubParameters == null)
+                                    continue;
+
+                                const chatCmd = new ChatModule(msg, config.prefix);
+                                if (!((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)))
+                                    continue;
+                            }
+                            execute(socks, msg, glob);
                         }
                     }
                 },
@@ -131,7 +128,6 @@ export namespace Module {
     }
 
     export class Loader {
-        // List: any[] = [];
         protected _AllList: any[] = [];
         protected _List: any[] = [];
         protected filteredModules: any[] = [];

@@ -22,10 +22,13 @@ setInterval(() => {
 
 const ModuleLoader = new Module.Loader(true);
 
-const startSock = async() => {
+const startSock = async(restart: boolean = false) => {
     const {state, saveCreds} = await useMultiFileAuthState('baileys_auth_info');
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`using WA v${version.join('.')}, isLatest: ${isLatest}`);
+    if (!restart)
+        console.log(`using WA v${version.join('.')}, isLatest: ${isLatest}`);
+    else
+        console.log(`Restarted sock. using WA v${version.join('.')}, isLatest: ${isLatest}`);
     
     const sock = makeWASocket.default({
         version,
@@ -51,7 +54,7 @@ const startSock = async() => {
 
             if (connection === 'close'){
                 if ((lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut)
-                    startSock();
+                    startSock(true);
                 else
                     console.log('Connection closed. You are logged out.');
             }
