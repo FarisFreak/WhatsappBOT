@@ -105,19 +105,55 @@ export namespace Module {
                     } else {
                         const baseData = data as BaileysEventMap['messages.upsert'];
 
-                        for (const msg of baseData.messages){
-                            if (command && command !== ''){
-                                if (msg.broadcast || msg.key.fromMe)
-                                    continue;
+                        // for (const msg of baseData.messages){
+                        //     if (command && command !== ''){
+                        //         if (msg.broadcast || msg.key.fromMe)
+                        //             continue;
 
-                                if (!msg.messageStubParameters == null)
-                                    continue;
+                        //         if (!msg.messageStubParameters == null)
+                        //             continue;
 
-                                const chatCmd = new ChatModule(msg, config.prefix);
-                                if (!((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)))
-                                    continue;
-                            }
-                            execute(socks, msg, glob);
+                        //         const chatCmd = new ChatModule(msg, config.prefix);
+                        //         if (!((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)))
+                        //             continue;
+                        //     }
+                        //     execute(socks, msg, glob);
+                        // }
+
+                        // for (const msg of baseData.messages){
+                        //     if (command && command !== ''){
+                        //         if (msg.broadcast || msg.key.fromMe)
+                        //             continue;
+                                
+                        //         if (!msg.messageStubType){
+                        //             const chatCmd = new ChatModule(msg, config.prefix);
+                        //             if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command))
+                        //                 execute(socks, msg, glob);
+                        //         }
+                        //     } else {
+                        //         execute(socks, msg, glob);
+                        //     }
+                        // }
+
+                        
+
+                        if (command && command !== '') {
+                            baseData.messages.forEach(msg => {
+                                if (msg.broadcast || msg.key.fromMe) {
+                                    return;
+                                }
+
+                                if (msg.messageStubType == null && msg.messageStubType == undefined){
+                                    const chatCmd = new ChatModule(msg, config.prefix);
+                                    if ((config.free && chatCmd.ContainsCommand(config.command as string)) || (chatCmd.Get.Command() === command)){
+                                        execute(socks, msg, glob);
+                                    }
+                                }
+                            });
+                        } else {
+                            baseData.messages.forEach(msg => {
+                                execute(socks, msg, glob);
+                            });
                         }
                     }
                 },
